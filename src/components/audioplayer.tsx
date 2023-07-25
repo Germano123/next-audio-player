@@ -3,13 +3,27 @@ import { MutableRefObject, useEffect, useRef, useState } from 'react';
 import styles from '../styles/audioplayer.module.css';
 
 export default function AudioPlayer() {
-  const audio = {
-    name: "Dark Beat 01",
-    path: "/audio/beat1.wav",
-    author: "Ítalo",
-    img: "/placeholder/musician.jpg"
-  }
-  // const [audio, setAudio] = useState(null);
+  const audios = [
+    {
+      name: "Dark Beat 01",
+      path: "https://beats-nft-bucket.s3.sa-east-1.amazonaws.com/beat+1.wav",
+      author: "Ítalo",
+      img: "/placeholder/musician.jpg",
+    },
+    {
+      name: "Dark Beat 02",
+      path: "https://beats-nft-bucket.s3.sa-east-1.amazonaws.com/beat+2.wav",
+      author: "Ítalo",
+      img: "/placeholder/musician.jpg",
+    },
+    {
+      name: "Dark Beat 03",
+      path: "https://beats-nft-bucket.s3.sa-east-1.amazonaws.com/beat+3.wav",
+      author: "Ítalo",
+      img: "/placeholder/musician.jpg",
+    }
+  ];
+  const [selected, setSelected] = useState(0);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -66,8 +80,20 @@ export default function AudioPlayer() {
   }
 
   const random = () => {}
-  const rewind = () => {}
-  const next = () => {}
+  
+  const rewind = () => {
+    // if duration < 10
+    // rewind
+    // else
+    // previous one
+  }
+
+  const next = () => {
+    const val = (selected + 1) % audios.length;
+    setSelected(val);
+    // play current music
+  }
+  
   const repeat = () => {}
 
   const mute = () => {
@@ -86,14 +112,14 @@ export default function AudioPlayer() {
 
   return (
     <div className={ styles.audioplayer }>
-      <audio ref={audioRef} src={audio.path} />
+      <audio ref={audioRef} src={ audios[selected].path } />
       <div className={ styles.audiodetails }>
         <div className={ styles.audiodetailsimg }>
-          <img alt="Audio image" src={ audio.img } />
+          <img alt="Audio image" src={ audios[selected].img } />
         </div>
         <div className={ styles.audiodetailsinfo }>
-          <div><p>{ audio.name }</p></div>
-          <div><p>by { audio.author }</p></div>
+          <div><p>{ audios[selected].name }</p></div>
+          <div><p>by { audios[selected].author }</p></div>
         </div>
       </div>
       <div className={ styles.audiocontrols }>
