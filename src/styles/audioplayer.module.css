@@ -2,7 +2,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    min-height: 70px;
+    min-height: 14vh;
     width: 100vw;
     position: fixed;
     bottom: 0;
@@ -48,18 +48,63 @@
 .audiocontrols {
     display: flex;
     align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.audiocontrolsbtns {
+    display: flex;
+    align-items: center;
     justify-content: space-around;
     width: 400px;
 }
 
-.audiocontrols button {
+.audiocontrolsbtn button {
     margin: 10px;
     width: 80px;
     height: 30px;
 }
 
+.audiocontrolsprogress {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.audiocontrolsprogressbar {
+    --bar-bg: #50EAFF;
+    --seek-before-width: 100px;
+    --seek-before-color: #50EAFF;
+    --knobby: #123123;
+    --selected-nav: #aaee11;
+
+    width: 30vw;
+
+    background: var(--bar-bg);
+    border-radius: 10px;
+    position: relative;
+    outline: none;
+}
+
+.audiocontrolsprogresscurrenttime {
+
+}
+
+.audiocontrolsprogressduration {
+
+}
+
+.audiocontrolsprogress > * {
+    padding-right: 10px;
+    padding-left: 10px;
+}
+
 .audiovolume {
     display: flex;
+    align-items: center;
+    justify-content: space-around;
+    width: 240px;
+    padding-right: 15px;
 }
 
 .audiovolume input {

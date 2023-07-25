@@ -1,5 +1,5 @@
 'use client';
-import { MutableRefObject, useRef, useState } from 'react';
+import { MutableRefObject, useEffect, useRef, useState } from 'react';
 import styles from '../styles/audioplayer.module.css';
 
 export default function AudioPlayer() {
@@ -12,23 +12,81 @@ export default function AudioPlayer() {
   // const [audio, setAudio] = useState(null);
 
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [volume, setVolume] = useState(75);
+  const [currenttime, setCurrenttime] = useState(0);
   const [duration, setDuration] = useState(0);
 
-  const audioElement = useRef() as MutableRefObject<HTMLAudioElement>;
+  const animationRef = useRef() as MutableRefObject<any>;
+  const audioRef = useRef() as MutableRefObject<HTMLAudioElement>;
+  const progressbarRef = useRef() as MutableRefObject<HTMLInputElement>;
+  
+  useEffect(() => {
+    const seconds = Math.floor(audioRef.current.duration);
+    setDuration(seconds);
+    progressbarRef.current.max = `${seconds}`;
+  }, [audioRef?.current?.onloadedmetadata]);
+
+  const calculatetime = (secs: number) => {
+    const minutes = Math.floor(secs/60);
+    const returnmin = (minutes < 10) ? `0${ minutes }` : `${ minutes }`;
+    const seconds = Math.floor(secs%60);
+    const returnsecs = (seconds < 10) ? `0${ seconds }` : `${ seconds }`;
+    return `${ returnmin }:${ returnsecs }`;
+  }
 
   const playpause = () => {
     const previous = isPlaying;
     setIsPlaying(!previous);
     if (!previous) {
-      audioElement.current.play();
+      audioRef.current.play();
+      animationRef.current = requestAnimationFrame(whileplaying);
     } else {
-      audioElement.current.pause();
+      audioRef.current.pause();
+      cancelAnimationFrame(animationRef.current);
     }
+  }
+
+  const whileplaying = () => {
+    const val = Number(progressbarRef.current.value);
+    progressbarRef.current.value = `${ audioRef.current.currentTime }`;
+    changeplayercurrenttime(val);
+    animationRef.current = requestAnimationFrame(whileplaying);
+  }
+  
+  const changerange = () => {
+    const val = Number(progressbarRef.current.value);
+    audioRef.current.currentTime = val;
+    changeplayercurrenttime(val);
+  }
+
+  const changeplayercurrenttime = (value: number) => {
+    progressbarRef.current.style.setProperty('--seek-before-width', `${ value / duration * 100 }%`);
+    setCurrenttime(value);
+  }
+
+  const random = () => {}
+  const rewind = () => {}
+  const next = () => {}
+  const repeat = () => {}
+
+  const mute = () => {
+    const previous = isMuted;
+    setIsMuted(!previous);
+    if (!previous) {
+      audioRef.current.muted = true;
+    } else {
+      audioRef.current.muted = false;
+    }
+  }
+
+  const changevolume = () => {
+    // TODO: change volume with input
   }
 
   return (
     <div className={ styles.audioplayer }>
-      <audio ref={audioElement} src={audio.path} />
+      <audio ref={audioRef} src={audio.path} />
       <div className={ styles.audiodetails }>
         <div className={ styles.audiodetailsimg }>
           <img alt="Audio image" src={ audio.img } />
@@ -39,14 +97,22 @@ export default function AudioPlayer() {
         </div>
       </div>
       <div className={ styles.audiocontrols }>
-        <div><img alt="Icon random" src="/icons/Shuffle.png" /></div>
-        <div><img alt="Icon rewind" src="/icons/Rewind.png" /></div>
-        <div onClick={() => { playpause() }}><img src="/icons/Play.png" /></div>
-        <div><img alt="Icon fast forward" src="/icons/FastForward.png" /></div>
+        <div className={ styles.audiocontrolsbtns }>
+          <div onClick={() => { random() }}><img alt="Icon random" src="/icons/Shuffle.png" /></div>
+          <div onClick={() => { rewind() }}><img alt="Icon rewind" src="/icons/Rewind.png" /></div>
+          <div onClick={() => { playpause() }}><img src="/icons/Play.png" /></div>
+          <div onClick={() => { next() }}><img alt="Icon fast forward" src="/icons/FastForward.png" /></div>
+          <div onClick={() => { repeat() }}><img alt="Icon repeat" src="/icons/Repeat.png" /></div>
+        </div>
+        <div className={ styles.audiocontrolsprogress }>
+          <p className={ styles.audiocontrolsprogresscurrenttime }>{ calculatetime(currenttime) }</p>
+          <input type="range" className={ styles.audiocontrolsprogressbar } defaultValue="0" onChange={ changerange }/>
+          <p className={ styles.audiocontrolsprogressduration }>{(duration && !isNaN(duration)) && calculatetime(duration) }</p>
+        </div>
       </div>
       <div className={ styles.audiovolume }>
-        <div><img alt="Icon speaker" src="/icons/Speaker.png" /></div>
-        <input type="range" min="1" max="100" defaultValue="75" />
+        <div onClick={() => { mute() }}><img alt="Icon speaker" src="/icons/Speaker.png" /></div>
+        <input ref={progressbarRef} type="range" min="1" max="100" defaultValue="75" />
         <div><img alt="Icon faders" src="/icons/Faders.png" /></div>
       </div>
     </div>
